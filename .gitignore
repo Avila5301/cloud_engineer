@@ -1,0 +1,27 @@
+# Terraform
+**/.terraform/
+**/.terraform.lock.hcl
+**/terraform.tfvars
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/*.tfplan
+
+# AWS CLI scripts — generated resource ID files
+**/resource-ids.env
+
+# Credentials and secrets — never commit these
+*.pem
+*.key
+.env
+.env.*
+credentials
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo

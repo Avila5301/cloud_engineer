@@ -1,0 +1,16 @@
+# Copy this file to terraform.tfvars and fill in your values
+# terraform.tfvars is gitignored — never commit real values
+
+aws_region   = "us-east-1"
+project_name = "cloud-engineer-01"
+
+# Your public IP — run: curl https://checkip.amazonaws.com
+# Append /32 for a single IP
+admin_ip_cidr = "YOUR.PUBLIC.IP.HERE/32"
+
+# Name of an existing EC2 key pair in your target region
+key_pair_name = "your-key-pair-name"
+
+# Amazon Linux 2 AMI — update if using a different region
+# Find region-specific AMI: https://aws.amazon.com/amazon-linux-2/
+bastion_ami_id = "ami-0c02fb55956c7d316"
