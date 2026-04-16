@@ -1,71 +1,56 @@
 # Project 01 — AWS CLI Implementation
 
-## Overview
+## Learning Flow
 
-Two scripts are provided:
-- `deploy.sh` — provisions the entire VPC stack
-- `teardown.sh` — destroys all resources in the correct order
+Work through the three stages in order. Do not skip ahead to the solution.
 
-All resource IDs are written to `resource-ids.env` during deployment so teardown can find them automatically.
+```
+Stage 1: Exercise    → Build a partial version yourself
+Stage 2: Troubleshoot → Find and fix 5 errors in a broken script
+Stage 3: Solution    → Deploy the working version, keep it for future projects
+```
 
-## Prerequisites
+---
+
+## Stage 1 — Exercise: Build It
+
+**Folder:** `exercise/`
+
+You are given a skeleton deploy script with key sections intentionally left blank. Your job is to fill in the missing pieces using the AWS CLI documentation and what you know about VPC networking.
+
+The exercise README will guide you through what each blank expects. Do not look at the solution folder until you've made a genuine attempt.
+
+[Go to Exercise →](./exercise/README.md)
+
+---
+
+## Stage 2 — Troubleshoot: Fix It
+
+**Folder:** `troubleshoot/`
+
+You are given a complete-looking deploy script that has **5 intentional errors** embedded in it. Some are syntax errors. Some are logical errors that will either cause the deployment to fail outright or produce a broken network silently.
+
+Your job: find and fix all 5 errors without running the script first. Read it carefully.
+
+[Go to Troubleshoot →](./troubleshoot/README.md)
+
+---
+
+## Stage 3 — Solution: Deploy It
+
+**Folder:** `solution/`
+
+The complete, working deploy and teardown scripts. Once you have finished the exercise and troubleshoot stages, use these to perform the actual deployment.
+
+The solution scripts are also what subsequent projects will reference when they need this VPC to exist.
+
+[Go to Solution →](./solution/)
+
+---
+
+## Prerequisites (all stages)
 
 - AWS CLI v2 installed and configured (`aws configure`)
 - An EC2 key pair already created in your target region
-- `jq` installed (used to parse CLI JSON output)
-
-Install jq:
-```bash
-# Ubuntu/Debian
-sudo apt-get install jq
-
-# macOS
-brew install jq
-```
-
-## Setup
-
-Edit the variables at the top of `deploy.sh`:
-
-```bash
-AWS_REGION="us-east-1"
-AZ1="us-east-1a"
-AZ2="us-east-1b"
-KEY_PAIR_NAME="your-key-pair-name"    # Must already exist in your region
-YOUR_IP="$(curl -s https://checkip.amazonaws.com)/32"  # Auto-detects your IP
-```
-
-## Deploy
-
-```bash
-chmod +x deploy.sh teardown.sh
-./deploy.sh
-```
-
-The script will output progress as it creates each resource and save all IDs to `resource-ids.env`.
-
-## Verify
-
-After deployment, the script will output the Bastion Host public IP. Connect to it:
-
-```bash
-ssh -i ~/.ssh/your-key.pem ec2-user@<BASTION_PUBLIC_IP>
-```
-
-From inside the bastion:
-```bash
-# Confirm outbound internet access from public subnet
-curl https://checkip.amazonaws.com
-
-# The returned IP should match your bastion's public IP
-```
-
-## Teardown
-
-```bash
-./teardown.sh
-```
-
-The teardown script reads `resource-ids.env` and deletes everything in the correct order (NAT Gateway first, then wait for deletion, then release the Elastic IP, etc.).
-
-> NAT Gateway deletion takes ~1 minute. The script waits automatically.
+- `jq` installed (`sudo apt-get install jq` or `brew install jq`)
+- Your public IP: `curl https://checkip.amazonaws.com`

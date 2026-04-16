@@ -70,13 +70,14 @@ A Senior Cloud Engineer is expected to design and provision this from memory. By
 
 | Resource | Rate | Cost for 2hr session |
 |---|---|---|
-| NAT Gateway | $0.045/hr + data | ~$0.09 |
-| Elastic IP (attached) | Free while attached | $0.00 |
-| EC2 t3.micro (bastion) | ~$0.0104/hr | ~$0.02 |
+| NAT Gateway | $0.045/hr | ~$0.09 |
+| NAT Gateway EIP | $0.005/hr | ~$0.01 |
+| Bastion public IPv4 | $0.005/hr | ~$0.01 |
+| EC2 t3.micro (bastion) | $0.0104/hr | ~$0.02 |
 | VPC, subnets, IGW, routes | Free | $0.00 |
-| **Estimated total** | | **~$0.11** |
+| **Estimated total** | | **~$0.13** |
 
-> The NAT Gateway is the only meaningful cost driver. Tear it down when done.
+> **Important:** As of February 2024, AWS charges $0.005/hr for **all** public IPv4 addresses — whether attached or not. This applies to EIPs, NAT Gateway public IPs, and EC2 public IPs. The NAT Gateway remains the largest cost driver. Tear down promptly when done.
 
 ## Prerequisites
 
@@ -86,14 +87,24 @@ A Senior Cloud Engineer is expected to design and provision this from memory. By
 - Terraform >= 1.5 (for the Terraform method)
 - Basic familiarity with AWS networking concepts
 
+## How to Work Through This Project
+
+Each implementation method follows a three-stage learning flow:
+
+1. **Exercise** — Complete a skeleton/partial version yourself
+2. **Troubleshoot** — Find and fix 5 intentional errors in a broken version
+3. **Solution** — Deploy the complete, working version and keep it for future projects
+
+Work through all four methods for the deepest understanding, or pick one to start.
+
 ## Implementation Methods
 
-| Method | Folder | Estimated Time |
-|---|---|---|
-| AWS Console | [console/](./console/) | ~30 min |
-| AWS CLI | [aws-cli/](./aws-cli/) | ~20 min |
-| Terraform | [terraform/](./terraform/) | ~20 min |
-| CloudFormation | [cloudformation/](./cloudformation/) | ~20 min |
+| Method | Folder | Exercise | Troubleshoot | Solution |
+|---|---|---|---|---|
+| AWS Console | [console/](./console/) | Checklist with gaps | Broken environment audit | Full walkthrough |
+| AWS CLI | [aws-cli/](./aws-cli/) | Skeleton deploy script | 5 errors to find | Working deploy + teardown |
+| Terraform | [terraform/](./terraform/) | Partial main.tf | 5 errors to find | Complete configuration |
+| CloudFormation | [cloudformation/](./cloudformation/) | Partial template | 5 errors to find | Complete stack |
 
 ## Key Concepts
 

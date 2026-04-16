@@ -1,73 +1,55 @@
 # Project 01 — Terraform Implementation
 
-## Overview
+## Learning Flow
 
-This Terraform configuration provisions the complete foundational VPC network: VPC, subnets, Internet Gateway, NAT Gateway, route tables, security groups, and a bastion host.
+```
+Stage 1: Exercise    → Complete a partial main.tf
+Stage 2: Troubleshoot → Find and fix 5 errors in a broken configuration
+Stage 3: Solution    → Deploy the working configuration
+```
 
-## Prerequisites
+---
 
-- Terraform >= 1.5 installed
-- AWS CLI configured (`aws configure`)
-- An EC2 key pair already created in your target region
+## Stage 1 — Exercise: Build It
 
-## Files
+**Folder:** `exercise/`
 
-| File | Purpose |
-|---|---|
-| `main.tf` | All resource definitions |
-| `variables.tf` | Input variable declarations with defaults |
-| `outputs.tf` | Useful output values printed after apply |
-| `terraform.tfvars.example` | Example values — copy to `terraform.tfvars` |
+Complete `main.tf` by filling in all `# TODO` blocks. Variables and outputs are provided for you. You only need to write the resource blocks in `main.tf`.
 
-## Setup
+[Go to Exercise →](./exercise/README.md)
+
+---
+
+## Stage 2 — Troubleshoot: Fix It
+
+**Folder:** `troubleshoot/`
+
+A complete Terraform configuration with **5 intentional errors**. Some errors will cause `terraform apply` to fail. Others will apply successfully but produce broken or insecure infrastructure.
+
+Find and fix all 5 by reading the code — not by running it.
+
+[Go to Troubleshoot →](./troubleshoot/README.md)
+
+---
+
+## Stage 3 — Solution: Deploy It
+
+**Folder:** `solution/`
+
+The complete, working Terraform configuration. Use this for actual deployment.
 
 ```bash
+cd solution/
 cp terraform.tfvars.example terraform.tfvars
-```
-
-Edit `terraform.tfvars`:
-- Set `admin_ip_cidr` to your public IP: `curl https://checkip.amazonaws.com` then append `/32`
-- Set `key_pair_name` to your existing EC2 key pair name
-
-## Deploy
-
-```bash
+# Edit terraform.tfvars with your values
 terraform init
-terraform plan    # Review what will be created
-terraform apply   # Type 'yes' to confirm
+terraform plan
+terraform apply
 ```
 
-After apply, Terraform outputs your bastion's public IP and SSH command:
-
-```
-bastion_ssh_command = "ssh -i ~/.ssh/your-key.pem ec2-user@1.2.3.4"
-```
-
-## Verify
-
-SSH to the bastion:
-```bash
-ssh -i ~/.ssh/your-key-pair.pem ec2-user@<bastion_public_ip>
-```
-
-From the bastion, confirm outbound internet via NAT:
-```bash
-curl https://checkip.amazonaws.com
-# Should return the NAT Gateway's public IP, not the bastion's IP
-```
-
-## Teardown
-
+Teardown:
 ```bash
 terraform destroy
 ```
 
-Review the destroy plan carefully. Type `yes` to confirm.
-
-> The NAT Gateway is the main cost driver. Destroy promptly when done.
-
-## Notes
-
-- `terraform.tfvars` is excluded from git via `.gitignore` — never commit real IPs or key names
-- The configuration uses `count` on subnets so it's easy to add a third AZ later
-- All resources share `common_tags` for easy cost allocation filtering in AWS Cost Explorer
+[Go to Solution →](./solution/)
