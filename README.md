@@ -36,7 +36,7 @@ This structure ensures you build and debug before you deploy — which is how re
 ## Repository Structure
 
 ```
-cloud_engineer/
+aws-cloud-engineer/
 ├── docs/                          # Role definitions, project catalog, guides
 ├── projects/                      # All projects live here
 │   └── 01-foundational-vpc/       # Each project follows this pattern
@@ -54,6 +54,7 @@ cloud_engineer/
 │       │   ├── troubleshoot/
 │       │   └── solution/
 │       └── console/               # Step-by-step console walkthrough
+├── portfolio/                     # Your personal workspace for completed work
 └── templates/                     # Reusable project scaffold
 ```
 
