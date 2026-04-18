@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: >
   Project 01 - Foundational VPC Network — EXERCISE VERSION
   Complete the Resources section below.
-  Parameters and Outputs are provided for you.
+  Parameters and Outputs are provided for you — do not change them.
 
 # ============================================================
 # Parameters — already complete, read before writing Resources
@@ -50,27 +50,435 @@ Parameters:
     Default: t3.micro
     AllowedValues: [t3.micro, t3.small, t3.medium]
 
-# ============================================================
-# Resources — YOUR WORK
-#
-# Write all resource blocks here.
-# Use the logical IDs from the exercise README and the
-# Outputs section below to know how resources should be named.
-#
-# Refer to the AWS CloudFormation Resource Reference:
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html
-# ============================================================
-
 Resources:
-  # TODO: Write all resource blocks here
-  # Start with the VPC, then subnets, then gateways, then route tables,
-  # then security groups, then the EC2 instance.
-  # Each resource depends on the ones before it — work top to bottom.
 
-  PlaceholderDoNotDeploy:
-    Type: AWS::CloudFormation::WaitConditionHandle
-    # Remove this placeholder once you have written your first real resource.
-    # CloudFormation requires at least one resource in the Resources section.
+  # ============================================================
+  # TODO: VPC
+  # Resource type: AWS::EC2::VPC
+  #
+  # Properties needed:
+  #   - CidrBlock
+  #   - EnableDnsHostnames
+  #   - EnableDnsSupport
+  #   - Tags (Name and Project)
+  # ============================================================
+
+  # Start Here
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr              # already set — do not change
+      EnableDnsHostnames: false             # TODO: should this be true or false?
+      EnableDnsSupport: false               # TODO: should this be true or false?
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-vpc    # already set — do not change
+        - Key: Project
+          Value: !Ref ProjectName           # already set — do not change
+  # End: VPC
+
+
+  # ============================================================
+  # TODO: Public Subnet 1
+  # Resource type: AWS::EC2::Subnet
+  #
+  # Properties needed:
+  #   - VpcId (reference the VPC above)
+  #   - CidrBlock
+  #   - AvailabilityZone (use Fn::Select with index 0 and Fn::GetAZs)
+  #   - MapPublicIpOnLaunch
+  #   - Tags (Name and Tier)
+  # ============================================================
+
+  # Start Here
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC                        # already set — do not change
+      CidrBlock: !Ref PublicSubnet1Cidr      # already set — do not change
+      AvailabilityZone: !Select              # already set — do not change
+        - 0
+        - !GetAZs !Ref AWS::Region
+      MapPublicIpOnLaunch: false             # TODO: should public subnets auto-assign IPs? (true/false)
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-public-1  # already set — do not change
+        - Key: Tier
+          Value: public                        # already set — do not change
+  # End: Public Subnet 1
+
+
+  # ============================================================
+  # TODO: Public Subnet 2
+  # Same as Public Subnet 1 — use index 1 for AZ and PublicSubnet2Cidr.
+  # ============================================================
+
+  # Start Here
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC                        # already set — do not change
+      CidrBlock: !Ref PublicSubnet2Cidr      # already set — do not change
+      AvailabilityZone: !Select              # already set — do not change
+        - 1
+        - !GetAZs !Ref AWS::Region
+      MapPublicIpOnLaunch: false             # TODO: should public subnets auto-assign IPs? (true/false)
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-public-2  # already set — do not change
+        - Key: Tier
+          Value: public                        # already set — do not change
+  # End: Public Subnet 2
+
+
+  # ============================================================
+  # TODO: Private Subnet 1
+  # Resource type: AWS::EC2::Subnet
+  #
+  # Same structure as public subnets but:
+  #   - Use PrivateSubnet1Cidr
+  #   - Do NOT include MapPublicIpOnLaunch — private subnets stay private
+  #   - Tag Tier as "private"
+  # ============================================================
+
+  # Start Here
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC                          # already set — do not change
+      CidrBlock: !Ref PrivateSubnet1Cidr       # already set — do not change
+      AvailabilityZone: !Select                # already set — do not change
+        - 0
+        - !GetAZs !Ref AWS::Region
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-private-1  # already set — do not change
+        - Key: Tier
+          Value: private                        # already set — do not change
+  # End: Private Subnet 1
+
+
+  # ============================================================
+  # TODO: Private Subnet 2
+  # Same as Private Subnet 1 — use index 1 for AZ and PrivateSubnet2Cidr.
+  # ============================================================
+
+  # Start Here
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC                          # already set — do not change
+      CidrBlock: !Ref PrivateSubnet2Cidr       # already set — do not change
+      AvailabilityZone: !Select                # already set — do not change
+        - 1
+        - !GetAZs !Ref AWS::Region
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-private-2  # already set — do not change
+        - Key: Tier
+          Value: private                        # already set — do not change
+  # End: Private Subnet 2
+
+
+  # ============================================================
+  # TODO: Internet Gateway
+  # Resource type: AWS::EC2::InternetGateway
+  #
+  # Just needs a Name tag — the attachment is a separate resource below.
+  # ============================================================
+
+  # Start Here
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-igw  # already set — do not change
+  # End: Internet Gateway
+
+
+  # ============================================================
+  # TODO: Attach Internet Gateway to VPC
+  # Resource type: AWS::EC2::VPCGatewayAttachment
+  #
+  # Properties needed:
+  #   - VpcId (reference the VPC)
+  #   - InternetGatewayId (reference the IGW)
+  # ============================================================
+
+  # Start Here
+  IGWAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: ""               # TODO: !Ref VPC
+      InternetGatewayId: ""   # TODO: !Ref InternetGateway
+  # End: IGW Attachment
+
+
+  # ============================================================
+  # TODO: Elastic IP for NAT Gateway
+  # Resource type: AWS::EC2::EIP
+  #
+  # Properties needed:
+  #   - Domain (must be "vpc")
+  #
+  # Add a DependsOn for IGWAttachment — the IGW must be attached
+  # before the NAT Gateway can route traffic out.
+  # ============================================================
+
+  # Start Here
+  NatEIP:
+    Type: AWS::EC2::EIP
+    DependsOn: IGWAttachment   # already set — do not change
+    Properties:
+      Domain: ""               # TODO: "vpc" or "classic"?
+  # End: Elastic IP
+
+
+  # ============================================================
+  # TODO: NAT Gateway
+  # Resource type: AWS::EC2::NatGateway
+  #
+  # Properties needed:
+  #   - AllocationId (the EIP allocation — use !GetAtt NatEIP.AllocationId)
+  #   - SubnetId (which subnet should the NAT Gateway go in?)
+  #
+  # Question: Why must the NAT Gateway go in a PUBLIC subnet?
+  # ============================================================
+
+  # Start Here
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: ""   # TODO: !GetAtt NatEIP.AllocationId
+      SubnetId: ""       # TODO: !Ref PublicSubnet1 — NAT Gateway must be in a public subnet
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-nat  # already set — do not change
+  # End: NAT Gateway
+
+
+  # ============================================================
+  # TODO: Public Route Table
+  # Resource type: AWS::EC2::RouteTable
+  #
+  # Just needs VpcId and a Name tag.
+  # The route itself is a separate resource below.
+  # ============================================================
+
+  # Start Here
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: ""   # TODO: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-public-rt  # already set — do not change
+  # End: Public Route Table
+
+
+  # ============================================================
+  # TODO: Public Default Route
+  # Resource type: AWS::EC2::Route
+  #
+  # Properties needed:
+  #   - RouteTableId (reference the public route table)
+  #   - DestinationCidrBlock (all internet traffic)
+  #   - GatewayId (the Internet Gateway — NOT the NAT Gateway)
+  #
+  # Add a DependsOn for IGWAttachment.
+  # ============================================================
+
+  # Start Here
+  PublicDefaultRoute:
+    Type: AWS::EC2::Route
+    DependsOn: IGWAttachment   # already set — do not change
+    Properties:
+      RouteTableId: ""              # TODO: !Ref PublicRouteTable
+      DestinationCidrBlock: ""      # TODO: what CIDR covers all internet traffic?
+      GatewayId: ""                 # TODO: !Ref InternetGateway
+  # End: Public Default Route
+
+
+  # ============================================================
+  # TODO: Associate Public Subnet 1 with the Public Route Table
+  # Resource type: AWS::EC2::SubnetRouteTableAssociation
+  # ============================================================
+
+  # Start Here
+  PublicSubnet1RTA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: ""       # TODO: !Ref PublicSubnet1
+      RouteTableId: ""   # TODO: !Ref PublicRouteTable
+  # End: Public Subnet 1 Association
+
+
+  # ============================================================
+  # TODO: Associate Public Subnet 2 with the Public Route Table
+  # ============================================================
+
+  # Start Here
+  PublicSubnet2RTA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: ""       # TODO: !Ref PublicSubnet2
+      RouteTableId: ""   # TODO: !Ref PublicRouteTable
+  # End: Public Subnet 2 Association
+
+
+  # ============================================================
+  # TODO: Private Route Table
+  # Resource type: AWS::EC2::RouteTable
+  # ============================================================
+
+  # Start Here
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: ""   # TODO: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-private-rt  # already set — do not change
+  # End: Private Route Table
+
+
+  # ============================================================
+  # TODO: Private Default Route
+  # Resource type: AWS::EC2::Route
+  #
+  # Same destination as the public route (all internet traffic),
+  # but this one points to the NAT Gateway — NOT the IGW.
+  # Use NatGatewayId instead of GatewayId.
+  # ============================================================
+
+  # Start Here
+  PrivateDefaultRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: ""         # TODO: !Ref PrivateRouteTable
+      DestinationCidrBlock: "" # TODO: what CIDR covers all internet traffic?
+      NatGatewayId: ""         # TODO: !Ref NatGateway (use NatGatewayId, not GatewayId)
+  # End: Private Default Route
+
+
+  # ============================================================
+  # TODO: Associate Private Subnet 1 with the Private Route Table
+  # ============================================================
+
+  # Start Here
+  PrivateSubnet1RTA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: ""       # TODO: !Ref PrivateSubnet1
+      RouteTableId: ""   # TODO: !Ref PrivateRouteTable
+  # End: Private Subnet 1 Association
+
+
+  # ============================================================
+  # TODO: Associate Private Subnet 2 with the Private Route Table
+  # ============================================================
+
+  # Start Here
+  PrivateSubnet2RTA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: ""       # TODO: !Ref PrivateSubnet2
+      RouteTableId: ""   # TODO: !Ref PrivateRouteTable
+  # End: Private Subnet 2 Association
+
+
+  # ============================================================
+  # TODO: Bastion Security Group
+  # Resource type: AWS::EC2::SecurityGroup
+  #
+  # Inbound:
+  #   - SSH (port 22) from AdminIpCidr ONLY
+  #   - Do NOT open to 0.0.0.0/0 — this is a real security risk
+  # Outbound:
+  #   - All traffic (already set below — do not change)
+  # ============================================================
+
+  # Start Here
+  BastionSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SSH access to bastion from admin IP only
+      VpcId: ""   # TODO: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: ""    # TODO: "tcp" or "udp"?
+          FromPort: 0        # TODO: what port number is SSH?
+          ToPort: 0          # TODO: same as FromPort
+          CidrIp: ""         # TODO: !Ref AdminIpCidr — your IP only, not 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: 0.0.0.0/0  # already set — do not change
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-bastion-sg  # already set — do not change
+  # End: Bastion Security Group
+
+
+  # ============================================================
+  # TODO: Private Instance Security Group
+  # Resource type: AWS::EC2::SecurityGroup
+  #
+  # Inbound:
+  #   - SSH (port 22) from the BASTION SECURITY GROUP only
+  #   - Use SourceSecurityGroupId instead of CidrIp
+  #     This restricts by SG, not IP range
+  # Outbound:
+  #   - All traffic (already set below — do not change)
+  # ============================================================
+
+  # Start Here
+  PrivateInstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SSH access from bastion only
+      VpcId: ""   # TODO: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: ""                  # TODO: "tcp" or "udp"?
+          FromPort: 0                      # TODO: what port number is SSH?
+          ToPort: 0                        # TODO: same as FromPort
+          SourceSecurityGroupId: ""        # TODO: !Ref BastionSecurityGroup (NOT CidrIp)
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: 0.0.0.0/0               # already set — do not change
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-private-sg  # already set — do not change
+  # End: Private Instance Security Group
+
+
+  # ============================================================
+  # TODO: Bastion Host EC2 Instance
+  # Resource type: AWS::EC2::Instance
+  #
+  # Properties needed:
+  #   - ImageId (BastionAmiId parameter)
+  #   - InstanceType (BastionInstanceType parameter)
+  #   - SubnetId (which subnet should the bastion go in?)
+  #   - SecurityGroupIds (the bastion security group)
+  #   - KeyName (KeyPairName parameter)
+  #   - Tags (Name)
+  # ============================================================
+
+  # Start Here
+  BastionHost:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ""           # TODO: !Ref BastionAmiId
+      InstanceType: ""      # TODO: !Ref BastionInstanceType
+      SubnetId: ""          # TODO: !Ref PublicSubnet1 — bastion goes in a public subnet
+      SecurityGroupIds:
+        - ""                # TODO: !Ref BastionSecurityGroup
+      KeyName: ""           # TODO: !Ref KeyPairName
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-bastion  # already set — do not change
+  # End: Bastion Host
+
 
 # ============================================================
 # Outputs — already complete
