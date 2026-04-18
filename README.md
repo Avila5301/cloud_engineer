@@ -54,7 +54,6 @@ aws-cloud-engineer/
 │       │   ├── troubleshoot/
 │       │   └── solution/
 │       └── console/               # Step-by-step console walkthrough
-├── portfolio/                     # Your personal workspace for completed work
 └── templates/                     # Reusable project scaffold
 ```
 
